@@ -1,0 +1,7 @@
+.venv
+venv
+
+# Игнорируем кэш Python
+__pycache__
+*.pyc
+*.pyo
