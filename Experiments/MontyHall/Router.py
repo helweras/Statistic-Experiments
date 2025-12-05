@@ -8,7 +8,7 @@ router = APIRouter(
 )
 
 
-@router.get("/")
+@router.get("/info")
 def info():
     return {
         "status": "Good",
