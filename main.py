@@ -23,7 +23,7 @@ def start():
                     "description": "anything"
                 },
                 {
-                    "name": "Experiment_2",
+                    "name": "OldestBrother",
                     "uuid": 123345,
                     "description": "anything"
                 }]
