@@ -1,0 +1,12 @@
+# Virtual environment
+.venv/
+
+# PyCharm
+.idea/
+
+# Bytecode
+__pycache__/
+
+# System
+.DS_Store
+Thumbs.db
