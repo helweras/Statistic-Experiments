@@ -12,7 +12,7 @@ class Family:
     def incubator(self):
         start, stop = self.population
         children_count = random.randrange(start, stop + 1)
-        self.children = tuple(Child(self.gen_random_data()) for i in range(children_count))
+        self.children = tuple(Child(self.gen_random_data()) for _ in range(children_count))
 
     @staticmethod
     def gen_random_data():
@@ -53,7 +53,7 @@ class Child:
         self.younger = {"brother":0 , "sister":0}
 
 def gen_family(population: tuple, count_family=100):
-    list_family = tuple(Family(population) for i in range(count_family))
+    list_family = tuple(Family(population) for _ in range(count_family))
     return list_family
 
 x = gen_family((4,6), 1)
