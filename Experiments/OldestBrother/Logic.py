@@ -1,17 +1,24 @@
 from datetime import datetime, date
 import random
 import calendar
+from math import sqrt
 
 
 class Family:
-    def __init__(self, population: tuple):
+    def __init__(self, population: tuple, weight_born):
         self.population = population
         self.children: tuple = ()
+        self.weight = weight_born
         self.incubator()
+        self.condition_child()
+        self.children_count = 0
 
     def incubator(self):
         start, stop = self.population
-        children_count = random.randrange(start, stop + 1)
+        values = range(start, stop + 1)
+        self.weight = self.weight[start - 1:]
+        children_count = random.choices(values, weights=self.weight, k=1)[0]
+        self.children_count = children_count
         self.children = tuple(Child(self.gen_random_data()) for _ in range(children_count))
 
     @staticmethod
@@ -28,12 +35,12 @@ class Family:
 
     def condition_child(self):
         len_children = len(self.children)
-        for i in range(len_children-1):
-            for j in range(i+1, len_children):
+        for i in range(len_children - 1):
+            for j in range(i + 1, len_children):
                 child_1, child_2 = self.children[i], self.children[j]
-                sex = {"Men":"brother", "Woman": "sister"}
-                relative_sex_1 =sex[child_1.sex]
-                relative_sex_2 =sex[child_2.sex]
+                sex = {"Men": "brother", "Woman": "sister"}
+                relative_sex_1 = sex[child_1.sex]
+                relative_sex_2 = sex[child_2.sex]
                 delta = (child_1.born_data - child_2.born_data).days
                 if delta > 0:
                     child_1.older[relative_sex_2] += 1
@@ -41,29 +48,66 @@ class Family:
                 elif delta < 0:
                     child_1.younger[relative_sex_2] += 1
                     child_2.older[relative_sex_1] += 1
-
-
+                child_1.relative = True
+                child_2.relative = True
 
 
 class Child:
     def __init__(self, born_data):
         self.born_data = born_data
         self.sex = random.choice(("Men", "Woman"))
-        self.older = {"brother":0 , "sister":0}
-        self.younger = {"brother":0 , "sister":0}
+        self.older = {"brother": 0, "sister": 0}
+        self.younger = {"brother": 0, "sister": 0}
+        self.relative = False
 
-def gen_family(population: tuple, count_family=100):
-    list_family = tuple(Family(population) for _ in range(count_family))
+
+def gen_family(population: tuple, count_family=100, weight_born=(55, 33, 9, 2, 1)):
+    list_family = tuple(Family(population, weight_born=weight_born) for _ in range(count_family))
     return list_family
 
-x = gen_family((4,6), 1)
-x[0].condition_child()
-for ch in x[0].children:
-    print(ch.born_data)
-    print(ch.sex)
-    print(ch.older)
-    print(ch.younger)
-    print("-----------")
+
+def detected_relative(children_list: tuple[Child, ...]):
+    children = random.choice(children_list)
+    return children.relative
 
 
+def all_children(family_list: tuple[Family, ...]):
+    children_full_list = []
+    for family in family_list:
+        children_full_list.extend(family.children)
+    return tuple(children_full_list)
 
+def exp_new_family():
+    count = 0
+    for i in range(100):
+        family_list = gen_family((1, 5))
+        children = all_children(family_list)
+        count += detected_relative(children)
+
+    return count / 100 * 100
+
+
+def exp_old_family():
+    family_list = gen_family((1, 5))
+    children = all_children(family_list)
+    count = 0
+    for i in range(100):
+        count += detected_relative(children)
+    return count / 100 * 100
+
+
+#Сделать расчеты формулой
+
+
+# x = gen_family((1, 5), 1)
+# x[0].condition_child()
+# for ch in x[0].children:
+#     print(ch.born_data)
+#     print(ch.relative)
+#     print(ch.sex)
+#     print(ch.older)
+#     print(ch.younger)
+#     print("-----------")
+
+# print(f"New = {exp_new_family()}")
+# print(f"Old = {exp_old_family()}")
