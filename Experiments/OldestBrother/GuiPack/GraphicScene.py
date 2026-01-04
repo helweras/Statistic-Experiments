@@ -42,7 +42,7 @@ class Scene(QGraphicsScene):
 
         self.count_click = 10
 
-    def get_children(self, children_list: list):
+    def get_children(self, children_list: tuple):
         """
         Добавляет объекты ChildGraph на сцену с заданным смещением.
 

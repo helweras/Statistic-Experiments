@@ -5,7 +5,7 @@ from PyQt6.QtCore import Qt
 from GraphicScene import Scene, SelectedScene
 from ClassView import View
 from ChildrenGraph import ChildGraph
-from Experiments.OldestBrother.Logic import ChildHouse
+from Interface import child_house
 
 
 class MainWindow(QMainWindow):
@@ -17,7 +17,7 @@ class MainWindow(QMainWindow):
         self.scene_all = Scene()
         self.selected_scene = SelectedScene()
 
-        self.child_house = ChildHouse()
+        self.child_house = child_house
         self.add_child_in_scene()
 
         self.view_all = View(self.scene_all)
