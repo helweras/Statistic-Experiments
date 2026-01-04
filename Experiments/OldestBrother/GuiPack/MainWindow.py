@@ -5,7 +5,7 @@ from PyQt6.QtCore import Qt
 from GraphicScene import Scene, SelectedScene
 from ClassView import View
 from ChildrenGraph import ChildGraph
-from Experiments.OldestBrother.Logic import ret_children
+from Experiments.OldestBrother.Logic import ChildHouse
 
 
 class MainWindow(QMainWindow):
@@ -16,6 +16,8 @@ class MainWindow(QMainWindow):
 
         self.scene_all = Scene()
         self.selected_scene = SelectedScene()
+
+        self.child_house = ChildHouse()
         self.add_child_in_scene()
 
         self.view_all = View(self.scene_all)
@@ -38,8 +40,10 @@ class MainWindow(QMainWindow):
 
         self.setCentralWidget(central)
 
+
+
     def add_child_in_scene(self):
-        self.scene_all.get_children(ret_children())
+        self.scene_all.get_children(self.child_house.get_shuffle_children())
 
     def rebase_selected_children(self, scene_1: Scene, scene_2:Scene):
         print(len(scene_1.selectedItems()))
