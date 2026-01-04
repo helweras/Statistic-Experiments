@@ -8,3 +8,6 @@ __pycache__
 
 #Игнорирование списка с экспериментами
 experiment_list.md
+
+#Десктопный интерфейс
+Experiments/OldestBrother/GuiPack

@@ -2,6 +2,7 @@ from datetime import datetime, date
 import random
 import calendar
 from math import sqrt
+from random import shuffle
 
 
 class Family:
@@ -38,6 +39,8 @@ class Family:
         for i in range(len_children - 1):
             for j in range(i + 1, len_children):
                 child_1, child_2 = self.children[i], self.children[j]
+                child_1.get_relative(child_2)
+                child_2.get_relative(child_1)
                 sex = {"Men": "brother", "Woman": "sister"}
                 relative_sex_1 = sex[child_1.sex]
                 relative_sex_2 = sex[child_2.sex]
@@ -59,6 +62,15 @@ class Child:
         self.older = {"brother": 0, "sister": 0}
         self.younger = {"brother": 0, "sister": 0}
         self.relative = False
+        self.name = 0
+        self.relative_list = []
+
+    def get_num(self, num):
+        self.name = num
+
+    def get_relative(self, relative):
+        if relative not in self.relative_list:
+            self.relative_list.append(relative)
 
 
 def gen_family(population: tuple, count_family=100, weight_born=(55, 33, 9, 2, 1)):
@@ -71,11 +83,17 @@ def detected_relative(children_list: tuple[Child, ...]):
     return children.relative
 
 
-def all_children(family_list: tuple[Family, ...]):
+def all_children(family_list: tuple[Family, ...]) -> tuple:
+    c = 1
     children_full_list = []
     for family in family_list:
+        for child in family.children:
+            child.get_num(c)
+            c += 1
+
         children_full_list.extend(family.children)
     return tuple(children_full_list)
+
 
 def exp_new_family():
     count = 0
@@ -90,13 +108,22 @@ def exp_new_family():
 def exp_old_family():
     family_list = gen_family((1, 5))
     children = all_children(family_list)
-    count = 0
-    for i in range(100):
-        count += detected_relative(children)
-    return count / 100 * 100
+    # count = 0
+    # for i in range(100):
+    #     count += detected_relative(children)
+    # return count / 100 * 100
 
 
-#Сделать расчеты формулой
+def ret_children(r=False):
+    f_list = gen_family((1, 5))
+    if r:
+        children = list(all_children(f_list))
+        random.shuffle(children)
+        return tuple(children)
+    return all_children(f_list)
+
+
+# Сделать расчеты формулой
 
 
 # x = gen_family((1, 5), 1)
