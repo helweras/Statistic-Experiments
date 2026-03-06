@@ -104,8 +104,8 @@ def start_experiment(
             strategy_name = "Change"
         else:
             strategy_name = "Stay"
-        data_base[strategy_name] = get_base_case(change=strat)
+        # data_base[strategy_name] = get_base_case(change=strat)
         data_other[strategy_name] = get_result(change=strat, count_prize=count_prize, count_door=count_door,
                                                closed_door=closed_door,
                                                iteration=iteration)
-    return {"Base": data_base, "Customizable": data_other}
+    return {"Customizable": data_other}
