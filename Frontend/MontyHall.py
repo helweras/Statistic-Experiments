@@ -93,6 +93,18 @@ class MontyHallPage:
                             но **не все** оставшиеся двери.
                             """)
 
+    def render_graph(self):
+        if st.session_state.data_set is not None:
+            df = pn.DataFrame(st.session_state.data_set)
+            df["двери"] = df.index + 3
+            df = df.set_index("двери")
+            st.write("### 📈 Динамика вероятности выигрыша")
+            st.line_chart(
+                df,
+                y=["Change", "Stay"],  # Берем только эти две колонки для линий
+                color=["#2ecc71", "#e74c3c"]  # Зеленый для смены, Красный для "остаться"
+            )
+
     @st.fragment
     def research_mode(self):
         st.subheader("🚀 Сценарий: Масштабирование (D от 3 до 20)")
@@ -107,7 +119,7 @@ class MontyHallPage:
             with col1:
                 s_fixed = st.number_input("Фикс. количество призов (S)", 1, 5, 1)
             with col2:
-                it = st.select_slider("Итераций в каждой точке", options=[50, 100, 150], value=75)
+                it = st.select_slider("Итераций в каждой точке", options=[50, 75, 100, 150], value=75)
 
             max_d = st.slider("До какого количества дверей (D) дойти?", 5, 20, 10)
             num_points = max_d - s_fixed - 1
@@ -139,8 +151,8 @@ class MontyHallPage:
                     y=["Change", "Stay"],  # Берем только эти две колонки для линий
                     color=["#2ecc71", "#e74c3c"]  # Зеленый для смены, Красный для "остаться"
                 )
-                with st.expander("🔬 Посмотреть детальную таблицу"):
-                    st.table(df)
+            with st.expander("🔬 Посмотреть детальную таблицу"):
+                st.table(df)
 
     def start_simulate(self, data):
         response = self.post_request(data)
