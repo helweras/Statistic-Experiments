@@ -49,7 +49,7 @@ class MontyHallPage:
         return self.url + self.prefix + self.endpoints[end]
 
     def post_request(self, data: dict):
-        response = requests.post(self.get_url(1), json=data)
+        response = requests.post(self.get_url(1), json=data, timeout=20)
         return response.json()
 
     def create_button(self):
@@ -95,7 +95,7 @@ class MontyHallPage:
 
     @st.fragment
     def research_mode(self):
-        st.subheader("🚀 Сценарий: Масштабирование (D от 3 до 50)")
+        st.subheader("🚀 Сценарий: Масштабирование (D от 3 до 20)")
         st.write("Выясним, как растет преимущество смены выбора с увеличением общего числа дверей.")
 
         if "data_set" not in st.session_state:
@@ -107,9 +107,9 @@ class MontyHallPage:
             with col1:
                 s_fixed = st.number_input("Фикс. количество призов (S)", 1, 5, 1)
             with col2:
-                it = st.select_slider("Итераций в каждой точке", options=[50, 100, 200], value=100)
+                it = st.select_slider("Итераций в каждой точке", options=[50, 100, 150], value=75)
 
-            max_d = st.slider("До какого количества дверей (D) дойти?", 5, 30, 15)
+            max_d = st.slider("До какого количества дверей (D) дойти?", 5, 20, 10)
             num_points = max_d - s_fixed - 1
             st.info(f"📊 Будет проведено **{num_points}** экспериментов (по одной точке на каждое количество дверей).")
 
@@ -130,7 +130,17 @@ class MontyHallPage:
                             data_set.append(result)
                 st.session_state.data_set = data_set
             if st.session_state.data_set is not None:
-                st.write(st.session_state.data_set)
+                df = pn.DataFrame(st.session_state.data_set)
+                df["двери"] = df.index + 3
+                df = df.set_index("двери")
+                st.write("### 📈 Динамика вероятности выигрыша")
+                st.line_chart(
+                    df,
+                    y=["Change", "Stay"],  # Берем только эти две колонки для линий
+                    color=["#2ecc71", "#e74c3c"]  # Зеленый для смены, Красный для "остаться"
+                )
+                with st.expander("🔬 Посмотреть детальную таблицу"):
+                    st.table(df)
 
     def start_simulate(self, data):
         response = self.post_request(data)
