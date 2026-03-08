@@ -97,14 +97,12 @@ def start_experiment(
     возвращает результаты двух экспериментов в виде словаря:
     "Base": data_base, "Customizable": data_other
     """
-    data_base = {}
     data_other = {}
     for strat in strategy:
         if strat:
             strategy_name = "Change"
         else:
             strategy_name = "Stay"
-        # data_base[strategy_name] = get_base_case(change=strat)
         data_other[strategy_name] = get_result(change=strat, count_prize=count_prize, count_door=count_door,
                                                closed_door=closed_door,
                                                iteration=iteration)
