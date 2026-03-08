@@ -1,6 +1,6 @@
 import streamlit as st
 import requests
-from MontyHall import MontyHallPage
+from MontyHallComponents.MontyHallPage import MontyHallPage
 
 
 class HomePage:
