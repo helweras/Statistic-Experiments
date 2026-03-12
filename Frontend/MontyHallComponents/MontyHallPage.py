@@ -1,7 +1,8 @@
 import streamlit as st
 import requests
-import pandas as pn
 from .InputForm import InputForm
+from .ServiceClass import Service
+from .ExploreDoors import ExploreDoors
 
 
 class MontyHallPage:
@@ -49,6 +50,8 @@ class MontyHallPage:
                                                         но **не все** оставшиеся двери.
                                                         """
     input_form = InputForm()
+    service = Service()
+    explore_doors = ExploreDoors()
 
     def get_info(self):
         response = requests.get(self.get_url(0))
@@ -57,7 +60,7 @@ class MontyHallPage:
     def get_url(self, end):
         return self.url + self.prefix + self.endpoints[end]
 
-    def post_request(self, data: dict):
+    def post_request(self, data: dict, url):
         response = requests.post(self.get_url(1), json=data, timeout=20)
         return response.json()
 
@@ -73,23 +76,17 @@ class MontyHallPage:
             return True
         return False
 
-    def create_pandas_table(self, data_set):
-        df = pn.DataFrame(data_set)
-        df["двери"] = df.index + 3
-        df = df.set_index("двери")
-        return df
+    @st.fragment
+    def research_mode(self):
+        st.subheader("🚀Масштабирование")
 
-    def render_graph(self, pandas_table):
-        st.write("### 📈 Динамика вероятности выигрыша")
-        st.line_chart(
-            pandas_table,
-            y=["Change", "Stay"],  # Берем только эти две колонки для линий
-            color=["#2ecc71", "#e74c3c"]  # Зеленый для смены, Красный для "остаться"
-        )
+        if "data_set" not in st.session_state:
+            st.session_state.data_set = None
 
-    def get_pandas_table(self, pandas_table):
-        with st.expander("🔬 Посмотреть детальную таблицу"):
-            st.dataframe(pandas_table)
+        scenario = self.select_params()
+
+        # Настройки внутри фрагмента
+        self.explore_doors.explore(self.get_url(1), self.text_validation)
 
     def select_params(self):
         scenario = st.selectbox(
@@ -101,129 +98,8 @@ class MontyHallPage:
         )
         return scenario
 
-    def explore_close_doors(self):
-        with st.container(border=True):
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                s_fixed = st.number_input("Фикс. количество призов", 1, 10, 1)
-            with col2:
-                it = st.select_slider("Итераций в каждой точке", options=[50, 75, 100, 150], value=75)
-            with col3:
-                door = st.number_input("Фикс. количество дверей", 1, 10, 1)
-
-            max_close_doors = st.slider("До какого количества закрытых дверей дойти?", 5, 20, 10)
-
-            if st.button("Запустить масштабное исследование", type="primary"):
-                data_set = []
-                with st.status("Запуск симуляции...", expanded=True) as status:
-                    for close_door in range(s_fixed, max_close_doors + 1):
-                        status.update(label=f"Проведение эксперимнта №: {door - 2} ...")
-                        payload = {
-                            "count_prize": s_fixed,
-                            "count_doors": door,
-                            "closed_doors": close_door,
-                            "iterable": it
-                        }
-                        response = self.post_request(payload)
-                        if self.check_response(response):
-                            st.write(f"⚙️ успешно выполнено для {door} дверей...")
-                            result = response["data"]["Customizable"]
-                            data_set.append(result)
-
-                st.session_state.data_set = data_set
-            if self.check_data_set(st.session_state.data_set):
-                pandas_table = self.create_pandas_table(st.session_state.data_set)
-                self.render_graph(pandas_table)
-
-    @staticmethod
-    def valid_input_data(count_prize, count_door, closed_door):
-        """Валидация принимаемых значений"""
-        first = count_prize <= count_door - 2
-        second = count_door - 1 > closed_door >= count_prize
-        three = count_prize > 0 and count_door > 0 and closed_door > 0
-        if all((first, second, three)):
-            return True
-        return False
-
-    def run_simulation(self, s_fixed, max_d, close_doors, it):
-        """Бизнес-логика: сбор данных через API."""
-        data_set = []
-        # Валидация всех шагов перед запуском
-        for door in range(close_doors + 2, max_d + 1):
-            if not self.valid_input_data(s_fixed, door, close_doors):
-                st.error(f"Ошибка валидации для {door} дверей: {self.text_validation}")
-                return None
-
-        status_text = st.empty()
-        for door in range(close_doors + 2, max_d + 1):
-            status_text.text(f"⏳ Симуляция для {door} дверей...")
-            payload = {
-                "count_prize": s_fixed,
-                "count_doors": door,
-                "closed_doors": close_doors,
-                "iterable": it
-            }
-            response = self.post_request(payload)
-
-            if self.check_response(response):
-                data_set.append(response["data"]["Customizable"])
-            else:
-                return None
-        return data_set
-
-    def process_and_render_results(self):
-        """Бизнес-процесс обработки и отрисовки."""
-        if not st.session_state.get("data_set"):
-            return
-
-        df = self.create_pandas_table(st.session_state.data_set)
-
-        # Отладочная проверка: если здесь пусто, график упадет
-        if df.empty:
-            st.warning("Таблица данных пуста. Проверьте ответ от API.")
-            return
-
-        st.subheader("Результаты исследования")
-        self.get_pandas_table(df)  # Посмотрите, есть ли там колонка "Change"
-
-        # Вызываем рендер только если данные валидны
-        if "Change" in df.columns:
-            self.render_graph(df)
-        else:
-            st.error(f"Столбец 'Change' не найден. Доступные столбцы: {list(df.columns)}")
-
-    def explore_doors(self):
-        with st.container(border=True):
-            # 1. Блок ввода параметров
-            c1, c2, c3 = st.columns(3)
-            s_fixed = c1.number_input("Фикс. количество призов", 1, 10, 1)
-            close_doors = c2.number_input("Фикс. закрытых дверей", 1, 10, 1)
-            it = c3.select_slider("Итераций", options=[50, 75, 100, 150], value=75)
-            max_d = st.slider("Макс. количество дверей", 5, 20, 10)
-
-            # 2. Кнопка запуска
-            if st.button("Запустить масштабное исследование", type="primary"):
-                results = self.run_simulation(s_fixed, max_d, close_doors, it)
-
-                if results:
-                    st.session_state.data_set = results
-                    self.process_and_render_results()
-
-    @st.fragment
-    def research_mode(self):
-        st.subheader("🚀 Сценарий: Масштабирование (D от 3 до 20)")
-        st.write("Выясним, как растет преимущество смены выбора с увеличением общего числа дверей.")
-
-        if "data_set" not in st.session_state:
-            st.session_state.data_set = None
-
-        scenario = self.select_params()
-
-        # Настройки внутри фрагмента
-        self.explore_doors()
-
     def start_simulate(self, data):
-        response = self.post_request(data)
+        response = self.service.post_request(data, url=self.get_url(1))
         with st.expander("Посмотреть сырые данные от сервера"):
             st.json(response)
         if self.check_response(response):
