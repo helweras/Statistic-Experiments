@@ -2,7 +2,7 @@ import streamlit as st
 import requests
 from .InputForm import InputForm
 from .ServiceClass import Service
-from .ExploreDoors import ExploreDoors
+from .ExploreDoors import ExploreDoors, ExploreCloseDoors, Explore
 
 
 class MontyHallPage:
@@ -51,7 +51,16 @@ class MontyHallPage:
                                                         """
     input_form = InputForm()
     service = Service()
+
     explore_doors = ExploreDoors()
+    explore_close_doors = ExploreCloseDoors()
+
+    # Реестр классов экспериментов (не экземпляров!)
+    EXPERIMENTS = {
+        "Количество дверей": ExploreDoors,
+        "Количество закрытых дверей": ExploreCloseDoors,
+        "Количество призов": None,
+    }
 
     def get_info(self):
         response = requests.get(self.get_url(0))
@@ -84,14 +93,17 @@ class MontyHallPage:
             st.session_state.data_set = None
 
         scenario = self.select_params()
+        if scenario:
+            experiment: Explore = self.EXPERIMENTS[scenario]()
+            experiment.explore(self.get_url(1), text_validation=self.text_validation)
 
         # Настройки внутри фрагмента
-        self.explore_doors.explore(self.get_url(1), self.text_validation)
+
 
     def select_params(self):
         scenario = st.selectbox(
-            "Выберете зависимую переменную",
-            ["Количество дверей", "Количество призов", "Количество закрытых дверей"],
+            label="Выберете зависимую переменную",
+            options=list(self.EXPERIMENTS.keys()),
             key="scenario_select",  # Уникальный ключ для фрагмента
             index=None,
             placeholder="Нажмите сюда"

@@ -103,11 +103,22 @@ class ExploreDoors(Explore):
 
             # 1. Блок ввода параметров
             c1, c2, c3 = st.columns(3)
-            max_doors = st.slider("Конечное количество дверей", 8, 20, 10)
-            min_doors = st.number_input("Начальное количество дверей", 3, max_doors - 5, 3)
+            max_doors = st.slider(label="Конечное количество дверей",
+                                  min_value=8,
+                                  max_value=20,
+                                  value=10,
+                                  key="max_doors"
+                                  )
+            min_doors = st.number_input(label="Начальное количество дверей",
+                                        min_value=3,
+                                        max_value=max_doors - 5,
+                                        value=3,
+                                        key="min_doors"
+                                        )
+            close_doors = c2.number_input("Количество закрытых дверей", 1, min_doors - 2, 1, key="close_doors")
             it = c3.select_slider("Итераций", options=[50, 75, 100, 150], value=75)
-            close_doors = c2.number_input("Количество закрытых дверей", 1, min_doors - 2, 1)
-            prize = c1.number_input("Количество призов", 1, close_doors, 1)
+
+            prize = c1.number_input("Количество призов", 1, close_doors, 1, key="prize")
             st.markdown(f"### 🚀 Симуляция стартует с **{min_doors}** и до **{max_doors}** дверей.")
 
             # 2. Кнопка запуска
@@ -163,15 +174,16 @@ class ExploreCloseDoors(Explore):
             st.write("Выясним, как растет преимущество смены выбора с увеличением общего числа закрытых дверей.")
             # 1. Блок ввода параметров
             c1, c2, c3 = st.columns(3)
-            s_fixed = c1.number_input("Количество призов", 1, 10, 1)
-            doors = c2.number_input("Количество дверей", 1, 20, 1)
+            max_close_doors = st.slider("Конечное закрытых количество дверей", 6, 20, 10)
+            min_close_doors = st.number_input("Начальное количество закрытых дверей", 1, max_close_doors - 5, 1)
             it = c3.select_slider("Итераций", options=[50, 75, 100, 150], value=75)
-            max_close_doors = st.slider("Конечное количество закрытых дверей", 5, 20, 10)
-            min_close_doors = st.slider("Начальное количество закрытых дверей", s_fixed, max_close_doors - 5, s_fixed)
+            doors = c2.number_input("Количество дверей", max_close_doors + 2, 22, max_close_doors + 2)
+            prize = c1.number_input("Количество призов", 1, min_close_doors, 1)
+            st.markdown(f"### 🚀 Симуляция стартует с **{min_close_doors}** и до **{max_close_doors}** закрытых дверей.")
 
             # 2. Кнопка запуска
             if st.button("Запустить масштабное исследование", type="primary"):
-                results = self.run_simulation(s_fixed=s_fixed,
+                results = self.run_simulation(prize=prize,
                                               max_close_doors=max_close_doors,
                                               doors=doors, it=it,
                                               url=url,
@@ -183,12 +195,12 @@ class ExploreCloseDoors(Explore):
             if st.session_state.data_set is not None:
                 self.process_and_render_results()
 
-    def run_simulation(self, min_close_doors, s_fixed, max_close_doors, doors, it, text_validation, url):
+    def run_simulation(self, min_close_doors, prize, max_close_doors, doors, it, text_validation, url):
         """Бизнес-логика: сбор данных через API."""
         data_set = []
         # Валидация всех шагов перед запуском
         for close_doors in range(min_close_doors, max_close_doors + 1):
-            response_valid_test = self.valid_input_data(s_fixed, doors, close_doors)
+            response_valid_test = self.valid_input_data(prize, doors, close_doors)
             if not response_valid_test["status"]:
                 st.error(response_valid_test["text"])
                 return None
@@ -197,7 +209,7 @@ class ExploreCloseDoors(Explore):
         for close_doors in range(min_close_doors, max_close_doors + 1):
             status_text.text(f"⏳ Симуляция для {close_doors} закрытых дверей...")
             payload = {
-                "count_prize": s_fixed,
+                "count_prize": prize,
                 "count_doors": doors,
                 "closed_doors": close_doors,
                 "iterable": it
