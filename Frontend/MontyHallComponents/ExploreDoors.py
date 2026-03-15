@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pn
 from .ServiceClass import Service
-
+import plotly.graph_objects as go
 
 class Explore:
     service = Service()
@@ -12,9 +12,19 @@ class Explore:
         st.write("### 📈 Динамика вероятности выигрыша")
         st.line_chart(
             pandas_table,
-            y=["Change", "Stay"],  # Берем только эти две колонки для линий
-            color=["#2ecc71", "#e74c3c"]  # Зеленый для смены, Красный для "остаться"
+            y=["Change", "Stay", "T_Change", "T_Stay"],  # Берем только эти две колонки для линий
+            color=["#2ecc71", "#e74c3c", "#a9dfbf", "#fadbd8"]  # Зеленый для смены, Красный для "остаться"
         )
+
+    def render_graph_plotly(self):
+        pass
+
+    @staticmethod
+    def get_theory(doors, prize, closed):
+        stay = (prize / doors) * 100
+        change = (prize * (doors - 1)) / (doors * closed) * 100
+        result = {"T_Stay": round(stay, 2), "T_Change": round(change, 2)}
+        return result
 
     def get_pandas_table(self, pandas_table):
         with st.expander("🔬 Посмотреть детальную таблицу"):
@@ -159,6 +169,8 @@ class ExploreDoors(Explore):
             response = self.service.post_request(payload, url)
 
             if self.service.check_response(response):
+                theory_data = self.get_theory(doors=door, prize=prize, closed=close_doors)
+                response["data"]["Customizable"].update(theory_data)
                 data_set.append(response["data"]["Customizable"])
             else:
                 return None
