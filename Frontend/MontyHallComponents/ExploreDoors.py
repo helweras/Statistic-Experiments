@@ -3,6 +3,7 @@ import pandas as pn
 from .ServiceClass import Service
 import plotly.graph_objects as go
 
+
 class Explore:
     service = Service()
     field_name = ""
@@ -16,8 +17,56 @@ class Explore:
             color=["#2ecc71", "#e74c3c", "#a9dfbf", "#fadbd8"]  # Зеленый для смены, Красный для "остаться"
         )
 
-    def render_graph_plotly(self):
-        pass
+    def render_graph_plotly(self, pandas_table):
+        st.write("### 📈 Анализ точности симуляции")
+
+        fig = go.Figure()
+
+        # 1. Линия Теории (делаем её фоновой, широкой и плавной)
+        fig.add_trace(go.Scatter(
+            x=pandas_table.index, y=pandas_table["T_Change"],
+            name="Теория (Изменить)",
+            line=dict(color="#bdecb6", width=7),
+            mode='lines'
+        ))
+
+        fig.add_trace(go.Scatter(
+            x=pandas_table.index, y=pandas_table["T_Stay"],
+            name="Теория (Оставить)",
+            line=dict(color="#fadbd8", width=7),
+            mode='lines'
+        ))
+
+        # 2. Линия Симуляции (яркая, с точками, чтобы подчеркнуть реальные опыты)
+        fig.add_trace(go.Scatter(
+            x=pandas_table.index, y=pandas_table["Change"],
+            name="Симуляция (Изменить)",
+            line=dict(color="#228b22", width=2),
+            marker=dict(size=5),
+            mode='lines+markers'
+        ))
+
+        # Повторяем для "Остаться"
+
+        fig.add_trace(go.Scatter(
+            x=pandas_table.index, y=pandas_table["Stay"],
+            name="Симуляция (Оставить)",
+            fill='tonexty',
+            fillcolor='rgba(46, 204, 113, 0.2)',
+            line=dict(color="#e74c3c", width=2),
+            marker=dict(size=5),
+            mode='lines+markers'
+        ))
+
+        fig.update_layout(
+            hovermode="x unified",  # Общая подсказка для всех линий при наведении
+            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=0.5),
+            margin=dict(l=0, r=0, t=30, b=0),
+            yaxis=dict(ticksuffix="%"),
+            xaxis_title="Количество дверей"
+        )
+
+        st.plotly_chart(fig, use_container_width=True)
 
     @staticmethod
     def get_theory(doors, prize, closed):
@@ -95,7 +144,7 @@ class Explore:
 
         # Вызываем рендер только если данные валидны
         if "Change" in df.columns:
-            self.render_graph(df)
+            self.render_graph_plotly(df)
         else:
             st.error(f"Столбец 'Change' не найден. Доступные столбцы: {list(df.columns)}")
 
