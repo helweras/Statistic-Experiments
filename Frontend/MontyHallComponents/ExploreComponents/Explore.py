@@ -66,7 +66,7 @@ class Explore:
             xaxis_title=self.field_name
         )
 
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
 
     @staticmethod
     def get_theory(doors, prize, closed):
