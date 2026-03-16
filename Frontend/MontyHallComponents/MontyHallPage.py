@@ -2,7 +2,8 @@ import streamlit as st
 import requests
 from .InputForm import InputForm
 from .ServiceClass import Service
-from .ExploreDoors import ExploreDoors, ExploreCloseDoors, Explore
+# from .ExploreDoors import ExploreDoors, ExploreCloseDoors, ExplorePrize, Explore
+from .ExploreComponents.ExploreInterface import ExplorePrize, ExploreDoors, ExploreCloseDoors, Explore
 
 
 class MontyHallPage:
@@ -59,7 +60,7 @@ class MontyHallPage:
     EXPERIMENTS = {
         "Количество дверей": ExploreDoors,
         "Количество закрытых дверей": ExploreCloseDoors,
-        "Количество призов": None,
+        "Количество призов": ExplorePrize,
     }
 
     def get_info(self):
