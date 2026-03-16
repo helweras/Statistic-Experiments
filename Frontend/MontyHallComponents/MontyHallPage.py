@@ -3,7 +3,7 @@ import requests
 from .InputForm import InputForm
 from .ServiceClass import Service
 # from .ExploreDoors import ExploreDoors, ExploreCloseDoors, ExplorePrize, Explore
-from .ExploreComponents.ExploreInterface import ExplorePrize, ExploreDoors, ExploreCloseDoors, Explore
+from .ExploreComponents import ExplorePrize, ExploreDoors, ExploreCloseDoors, Explore
 
 
 class MontyHallPage:
