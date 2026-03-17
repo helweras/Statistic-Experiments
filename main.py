@@ -26,7 +26,7 @@ def start():
                 },
                 {
                     "name": "Playground Paradox",
-                    "name_on_page": "Парадокс Монти-Холла",
+                    "name_on_page": "Парадокс детской площадки",
                     "uuid": 123345,
                     "description": "anything"
                 }]
