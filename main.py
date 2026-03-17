@@ -14,16 +14,19 @@ def start():
         "experiments":
             [{
                 "name": "Monty_Hall",
+                "name_on_page": "Парадокс Монти-Холла",
                 "uuid": 123345,
                 "description": "anything"
             },
                 {
                     "name": "Experiment_1",
+                    "name_on_page": None,
                     "uuid": 123345,
                     "description": "anything"
                 },
                 {
-                    "name": "OldestBrother",
+                    "name": "Playground Paradox",
+                    "name_on_page": "Парадокс Монти-Холла",
                     "uuid": 123345,
                     "description": "anything"
                 }]
