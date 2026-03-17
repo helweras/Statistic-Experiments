@@ -1,6 +1,6 @@
 import streamlit as st
 import requests
-from MontyHallComponents.MontyHallPage import MontyHallPage
+from MontyHall.MontyHallPage import MontyHallPage
 
 
 class HomePage:
@@ -31,7 +31,7 @@ class HomePage:
 
     def side_bar(self):
         st.sidebar.title("выбор эксперимента")
-        experiments_name = list(i['name'] for i in self.data['experiments'])
+        experiments_name = list(i['name_on_page'] for i in self.data['experiments'] if i['name_on_page'] is not None)
         with st.sidebar:
             st.header("Эксперименты")
             status_filter = st.selectbox(
