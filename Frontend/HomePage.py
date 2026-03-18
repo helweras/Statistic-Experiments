@@ -1,13 +1,15 @@
 import streamlit as st
 import requests
 from MontyHall.MontyHallPage import MontyHallPage
+from PlaygroundParadox.PlaygroundParadoxPage import PlayGroundPage
 
 
 class HomePage:
     url = "https://statistic-experiments.onrender.com"
     data: dict | None = None
     endpoints = {'Monty_Hall': "/monty_hall"}
-    pages = {'Monty_Hall': MontyHallPage()}
+    pages = {'Парадокс Монти-Холла': MontyHallPage(),
+             "Парадокс детской площадки": PlayGroundPage()}
 
     def __init__(self):
         self.start()
