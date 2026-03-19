@@ -7,15 +7,9 @@ class Plot:
         colors = ["#1fcecb", "#731fce", "#ce1f22", "#7ace1f", "#cecb1f"]
         label = list(data.keys())
         value = list(data.values())
-        value_midl = sum(list(
-            map(
-                lambda x: ((x[0] + 1) * x[-1]),
-                tuple(enumerate(data.values()))
-            )
-        )
-        ) / sum(tuple(data.values()))
         total = sum(value)
-        text_labels = [f"{round(v / total * 100, 1)}%" for v in value]
+        value = list(map(lambda x: x / total * 100, value))
+        text_labels = [f"{v:.1f}%" for v in value]
         fig = go.Figure(data=[
             go.Bar(x=label,
                    y=value,
@@ -25,25 +19,32 @@ class Plot:
                    text=text_labels
                    )
         ])
-        st.text(f"{value_midl:.2f}")
+
+        fig.update_layout(yaxis_title="Доля семей (%)", yaxis=dict(range=[0, 100]), height=400)
         st.plotly_chart(fig, width="content")
 
     def render_plot_children(self, data: dict):
         value = list(map(lambda x: (x[0] + 1) * x[-1], tuple(enumerate(data.values()))))
-        one = value[0]
-        many = sum(value) - one
+        total_kids = sum(value)
+        one_kid_perc = round(value[0] / total_kids * 100, 1)
+        many_kids_perc = round((total_kids - value[0]) / total_kids * 100, 1)
         label_data = ("Один ребенок", "Есть братья/сестры")
+
         colors = ("#ffdc33", "#3356ff")
 
         fig = go.Figure(data=[
             go.Bar(x=label_data,
-                   y=(one, many),
+                   y=(one_kid_perc, many_kids_perc),
                    name="",
                    marker=dict(color=colors),
                    orientation='v',
+                   text=[f"{t}%" for t in (one_kid_perc, many_kids_perc)]
                    )
         ])
+        fig.update_layout(yaxis_title="Доля детей (%)", yaxis=dict(range=[0, 100]), height=400)
         st.plotly_chart(fig, width="content")
+
+
 
     def render_two_plots(self, data: dict):
         col1, col2 = st.columns(2)

@@ -35,6 +35,10 @@ def pick_door(door_list: list[Door]) -> Door:
     door = door_list.pop(index)
     return door
 
+def open_door(door_list: list[Door], count_open=1):
+    open_doors = random.sample(list(filter(lambda door: not door.prize, door_list)), count_open)
+    pass
+
 
 def get_closed_doors(door_list: list[Door], closed=1):
     """Возвращает список дверей которые будут закрыты"""
