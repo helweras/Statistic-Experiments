@@ -1,7 +1,8 @@
-from PyQt6.QtWidgets import QGraphicsScene, QGraphicsItem
+from PyQt6.QtWidgets import QGraphicsScene
 from PyQt6.QtGui import QTransform, QPainter, QPen
 from PyQt6.QtCore import Qt
 from ChildrenGraph import ChildGraph
+from Experiments.PlaygroundParadox.Components.Child import Child
 
 
 class Scene(QGraphicsScene):

@@ -1,3 +1,3 @@
-from Experiments.PlaygroundParadox.Logic import ChildHouse
+from Experiments.PlaygroundParadox.Components.ChildHouse import ChildHouse
 
 child_house: ChildHouse = ChildHouse()

@@ -1,10 +1,6 @@
-import sys
-
-from PyQt6.QtWidgets import QApplication, QLabel, QMainWindow, QWidget, QHBoxLayout, QPushButton, QVBoxLayout
-from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QPushButton, QVBoxLayout
 from GraphicScene import Scene, SelectedScene
 from ClassView import View
-from ChildrenGraph import ChildGraph
 from Interface import child_house
 
 
@@ -40,12 +36,10 @@ class MainWindow(QMainWindow):
 
         self.setCentralWidget(central)
 
-
-
     def add_child_in_scene(self):
         self.scene_all.get_children(self.child_house.get_shuffle_children())
 
-    def rebase_selected_children(self, scene_1: Scene, scene_2:Scene):
+    def rebase_selected_children(self, scene_1: Scene, scene_2: Scene):
         print(len(scene_1.selectedItems()))
         selected_children = scene_1.get_selected_children()
         if selected_children:
@@ -55,7 +49,5 @@ class MainWindow(QMainWindow):
         scene_2.clearSelection()
         scene_1.clearSelection()
 
-
     def view_show(self):
         self.show()
-
