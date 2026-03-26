@@ -10,7 +10,7 @@ class ChildHouse:
     иметь братьев или сестер, перемешивания детей и получения статистики.
     """
 
-    def __init__(self, population: tuple = (1, 5)):
+    def __init__(self, weights_born, count_family=100, population: tuple = (1, 5)):
         """
         Инициализация ChildHouse и генерация семей и детей.
 
@@ -19,7 +19,7 @@ class ChildHouse:
         population : tuple[int, int], optional
             Диапазон количества детей в семьях (min, max), по умолчанию (1, 5).
         """
-        self.family_list = self.gen_family(population)
+        self.family_list = self.gen_family(population, weight_born=weights_born, count_family=count_family)
         self.all_children_list = self.all_children()
         self.chance_singleton_child()
         self.chance_sibling_child()
