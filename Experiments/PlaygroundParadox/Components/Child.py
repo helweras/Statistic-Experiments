@@ -1,4 +1,4 @@
-from datetime import  date
+from datetime import date
 import random
 
 
@@ -24,7 +24,7 @@ class Child:
         Список других детей в семье.
     """
 
-    def __init__(self, born_data: date):
+    def __init__(self, born_data: date, second_name=None):
         self.born_data = born_data
         self.sex = random.choice(("Men", "Woman"))
         self.older = {"brother": 0, "sister": 0}
@@ -32,6 +32,7 @@ class Child:
         self.relative = False
         self.name = 0
         self.relative_list = []
+        self.second_name = second_name
 
     def get_num(self, num: int):
         """

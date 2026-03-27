@@ -43,7 +43,11 @@ class ChildHouse:
         tuple[Family, ...]
             Кортеж объектов Family.
         """
-        list_family = tuple(Family(population, weight_born=weight_born) for _ in range(count_family))
+        list_family = tuple(Family(population,
+                                   weight_born=weight_born,
+                                   second_name=s_name
+                                   )
+                            for s_name in range(count_family))
         return list_family
 
     def get_shuffle_children(self, r=True) -> tuple:

@@ -3,6 +3,7 @@ import random
 import calendar
 from .Child import Child
 
+
 class Family:
     """
     Класс, представляющий семью и генерирующий детей с заданными параметрами.
@@ -19,7 +20,7 @@ class Family:
         Фактическое количество детей в семье после генерации.
     """
 
-    def __init__(self, population: tuple, weight_born: tuple):
+    def __init__(self, population: tuple, weight_born: tuple, second_name=None):
         """
         Инициализация семьи. Генерация детей происходит сразу.
 
@@ -34,6 +35,7 @@ class Family:
         self.children: tuple = ()
         self.weight = weight_born
         self.children_count = 0
+        self.second_name = second_name
 
         # Генерация детей и присвоение условий
         self.incubator()
@@ -53,7 +55,9 @@ class Family:
         self.children_count = children_count
 
         # Создание кортежа объектов Child
-        self.children = tuple(Child(self.gen_random_data()) for _ in range(children_count))
+        self.children = tuple(Child(self.gen_random_data(),
+                                    second_name=self.second_name
+                                    ) for _ in range(children_count))
 
     @staticmethod
     def gen_random_data() -> date:
