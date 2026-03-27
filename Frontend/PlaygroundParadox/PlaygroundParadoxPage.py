@@ -5,13 +5,16 @@ from .components import (
     render_description,
     render_explanations,
     render_finish,
+    render_head,
     render_instruction,
     render_midl_explanations,
     render_midl_metric,
     render_ratio,
+    render_select_part,
     render_setting_family,
     render_title
 )
+from .demography_casino import casino
 
 
 class PlayGroundPage:
@@ -43,7 +46,16 @@ class PlayGroundPage:
             render_midl_explanations()
             render_finish()
 
+    @st.fragment
+    def casino_block(self):
+        casino()
+
     def render(self):
-        render_description()
-        render_ratio()
-        self.config_family()
+        render_head()
+        part = render_select_part()
+        if part == "Разбор парадокса":
+            render_description()
+            render_ratio()
+            self.config_family()
+        elif part == "Играть в казино":
+            self.casino_block()
