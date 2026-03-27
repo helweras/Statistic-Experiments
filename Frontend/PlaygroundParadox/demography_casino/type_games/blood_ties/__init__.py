@@ -1,0 +1,1 @@
+from .kinship_detector import render_kinship

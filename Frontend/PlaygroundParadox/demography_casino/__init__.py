@@ -1,1 +1,1 @@
-from .game_engine import casino
+from .game_engine import Casino

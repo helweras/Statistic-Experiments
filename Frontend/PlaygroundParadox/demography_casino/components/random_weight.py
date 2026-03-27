@@ -1,4 +1,3 @@
-from Experiments.PlaygroundParadox.Components.ChildHouse import ChildHouse
 import random
 
 
@@ -9,6 +8,3 @@ def gen_random_weight():
     weights = tuple(next_val - current for current, next_val in zip(points, points[1:]))
 
     return weights
-
-
-child_house = ChildHouse()

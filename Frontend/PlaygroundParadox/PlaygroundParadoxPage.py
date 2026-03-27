@@ -14,7 +14,7 @@ from .components import (
     render_setting_family,
     render_title
 )
-from .demography_casino import casino
+from .demography_casino import Casino
 
 
 class PlayGroundPage:
@@ -48,7 +48,8 @@ class PlayGroundPage:
 
     @st.fragment
     def casino_block(self):
-        casino()
+        casino = Casino()
+        casino.render_casino()
 
     def render(self):
         render_head()
