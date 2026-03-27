@@ -1,7 +1,16 @@
 import streamlit as st
 import requests
 from .Plot import Plot
-from . import Components
+from .components import (
+    render_explanations,
+    render_finish,
+    render_instruction,
+    render_midl_explanations,
+    render_midl_metric,
+    render_ratio,
+    render_setting_family,
+    render_title
+)
 
 
 class PlayGroundPage:
@@ -42,16 +51,16 @@ class PlayGroundPage:
     @st.fragment
     def config_family(self):
         with st.container(border=True):
-            Components.render_title()
-            Components.render_instruction()
-            data = Components.render_setting_family()
+            render_title()
+            render_instruction()
+            data = render_setting_family()
             self.plot.render_two_plots(data)
-            Components.render_explanations()
-            Components.render_midl_metric(data)
-            Components.render_explanations()
-            Components.render_finish()
+            render_explanations()
+            render_midl_metric(data)
+            render_midl_explanations()
+            render_finish()
 
     def render(self):
         st.markdown(self.text)
-        Components.ratio()
+        render_ratio()
         self.config_family()
