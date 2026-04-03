@@ -1,4 +1,6 @@
 from fastapi import APIRouter, HTTPException
+from Models.PlaygroundParadox.BloodTiles import BloodTilesData
+from .Logic import blood_tiles
 
 rules = """# 👨‍👩‍👧‍👦 Парадокс детской площадки
 ### Почему мир кажется многодетным, когда статистика говорит об обратном?
@@ -35,3 +37,7 @@ def info():
     }
 
 
+@router.post("/start_blood_tiles")
+def start_blood_tiles(post_data: BloodTilesData):
+    result_data = blood_tiles(post_data)
+    return result_data
