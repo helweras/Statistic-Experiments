@@ -125,7 +125,7 @@ class Explore:
             }
             return response
 
-    def run_simulation(self, start_params, s_fixed, max_d, close_doors, it, text_validation, url):
+    def run_simulation(self, start_params, s_fixed, max_d, close_doors, it, url):
         """Бизнес-логика: сбор данных через API."""
         pass
 

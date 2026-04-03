@@ -9,7 +9,7 @@ from .ExploreComponents import ExplorePrize, ExploreDoors, ExploreCloseDoors, Ex
 class MontyHallPage:
     prefix = "/monty_hall"
     endpoints = ("/info", "/simulate")
-    url = 'https://statistic-experiments.onrender.com/'
+    url = 'https://statistic-experiments.onrender.com'
     text = """
 # 🧠 Парадокс Монти Холла
 
@@ -99,7 +99,6 @@ class MontyHallPage:
             experiment.explore(self.get_url(1), text_validation=self.text_validation)
 
         # Настройки внутри фрагмента
-
 
     def select_params(self):
         scenario = st.selectbox(

@@ -1,10 +1,63 @@
 import streamlit as st
 from .Explore import Explore
+import asyncio
+import httpx
 
 
 class ExploreDoors(Explore):
     field_name = "двери"
     const = 3
+
+    async def fetch_door_data(self, client, door, prize, close_doors, it, url):
+        """Отдельная асинхронная задача для одной двери"""
+        payload = {
+            "count_prize": prize,
+            "count_doors": door,
+            "closed_doors": close_doors,
+            "iterable": it
+        }
+
+        # Асинхронный POST запрос
+        response = await client.post(url, json=payload, timeout=30.0)
+
+        if response.status_code == 200:
+            data = response.json()
+            # Добавляем теоретические данные (твоя функция get_theory)
+            theory_data = self.get_theory(doors=door, prize=prize, closed=close_doors)
+            data["data"]["Customizable"].update(theory_data)
+            return data["data"]["Customizable"]
+        else:
+            return None
+
+    async def run_simulation_async(self, start_door, prize, end_doors, close_doors, it, url):
+        """Основной цикл, запускающий все запросы разом"""
+
+        # 1. Валидация (оставляем как есть, это быстро)
+        for door in range(start_door, end_doors + 1):
+            res_valid = self.valid_input_data(prize, door, close_doors)
+            if not res_valid["status"]:
+                st.error(res_valid["text"])
+                return None
+
+        status_text = st.empty()
+        status_text.text("🚀 Запуск параллельных симуляций...")
+
+        # 2. Создаем список задач (tasks)
+        tasks = []
+        # Используем AsyncClient для эффективных соединений
+        async with httpx.AsyncClient() as client:
+            for door in range(close_doors + 2, end_doors + 1):
+                # Создаем "задание", но пока не запускаем его
+                task = self.fetch_door_data(client, door, prize, close_doors, it, url)
+                tasks.append(task)
+
+            # 3. МАГИЯ: Запускаем все задачи ОДНОВРЕМЕННО
+            # gather вернет список результатов в том же порядке
+            data_set = await asyncio.gather(*tasks)
+
+        status_text.text("✅ Расчеты завершены!")
+        # Фильтруем None, если какие-то запросы упали
+        return [d for d in data_set if d is not None]
 
     def explore(self, url, text_validation):
         with st.container(border=True):
@@ -37,7 +90,6 @@ class ExploreDoors(Explore):
                                               prize=prize,
                                               close_doors=close_doors,
                                               it=it,
-                                              text_validation=text_validation,
                                               url=url
                                               )
 
@@ -46,7 +98,7 @@ class ExploreDoors(Explore):
             if st.session_state.data_set is not None:
                 self.process_and_render_results()
 
-    def run_simulation(self, start_door, prize, end_doors, close_doors, it, text_validation, url):
+    def run_simulation(self, start_door, prize, end_doors, close_doors, it, url):
         """Бизнес-логика: сбор данных через API."""
         data_set = []
         # Валидация всех шагов перед запуском
