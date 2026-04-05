@@ -1,5 +1,5 @@
 import random
-from ..Components.ChildHouse import ChildHouse
+from Experiments.PlaygroundParadox.Components import ChildHouse
 
 
 class BloodTiles:
@@ -22,7 +22,7 @@ class BloodTiles:
 
         weight = post_data["weight"]
         value = post_data["value"]
-        count_sim = post_data["count_simulation"]
+        count_sim = post_data["count_sim"]
         num_of_family = post_data["num_of_family"]
 
         counter = 0
@@ -40,6 +40,6 @@ class BloodTiles:
             if self.family_connect(result):
                 counter += 1
 
-        data = {"result": round(counter / count_sim, 2) * 100}
+        data = {"result": round(counter / count_sim * 100, 2)}
 
         return data

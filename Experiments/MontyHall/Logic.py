@@ -111,3 +111,4 @@ def start_experiment(
                                                closed_door=closed_door,
                                                iteration=iteration)
     return {"Customizable": data_other}
+
