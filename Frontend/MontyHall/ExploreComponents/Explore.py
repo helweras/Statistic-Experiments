@@ -5,19 +5,36 @@ from ..ServiceClass import Service
 
 
 class Explore:
+    """Класс для визуализации результатов симуляции и валидации входных данных.
+
+    Attributes:
+        service: Экземпляр класса Service для выполнения бизнес-логики.
+        field_name: Название колонки, используемой в качестве индекса (ось X).
+        const: Константа для смещения индекса таблицы.
+    """
     service = Service()
     field_name = ""
     const = 0
 
     def render_graph(self, pandas_table):
+        """Отрисовывает стандартный линейный график Streamlit.
+
+        Args:
+            pandas_table (pd.DataFrame): Таблица с результатами симуляции и теорией.
+        """
         st.write("### 📈 Динамика вероятности выигрыша")
         st.line_chart(
             pandas_table,
-            y=["Change", "Stay", "T_Change", "T_Stay"],  # Берем только эти две колонки для линий
-            color=["#2ecc71", "#e74c3c", "#a9dfbf", "#fadbd8"]  # Зеленый для смены, Красный для "остаться"
+            y=["Change", "Stay", "T_Change", "T_Stay"],
+            color=["#2ecc71", "#e74c3c", "#a9dfbf", "#fadbd8"]
         )
 
     def render_graph_plotly(self, pandas_table):
+        """Отрисовывает детализированный интерактивный график с помощью Plotly.
+
+        Args:
+            pandas_table (pd.DataFrame): Таблица с результатами симуляции и теорией.
+        """
         st.write("### 📈 Анализ точности симуляции")
 
         fig = go.Figure()
@@ -47,7 +64,6 @@ class Explore:
         ))
 
         # Повторяем для "Остаться"
-
         fig.add_trace(go.Scatter(
             x=pandas_table.index, y=pandas_table["Stay"],
             name="Оставить",
@@ -59,7 +75,7 @@ class Explore:
         ))
 
         fig.update_layout(
-            hovermode="x unified",  # Общая подсказка для всех линий при наведении
+            hovermode="x unified",
             legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=0.7),
             margin=dict(l=0, r=0, t=30, b=0),
             yaxis=dict(ticksuffix="%"),
@@ -70,16 +86,39 @@ class Explore:
 
     @staticmethod
     def get_theory(doors, prize, closed):
+        """Рассчитывает теоретическую вероятность выигрыша.
+
+        Args:
+            doors (int): Общее количество дверей.
+            prize (int): Количество призов.
+            closed (int): Количество дверей, остающихся закрытыми.
+
+        Returns:
+            dict: Словарь с ключами 'T_Stay' и 'T_Change' (округленные значения).
+        """
         stay = (prize / doors) * 100
         change = (prize * (doors - 1)) / (doors * closed) * 100
         result = {"T_Stay": round(stay, 2), "T_Change": round(change, 2)}
         return result
 
     def get_pandas_table(self, pandas_table):
+        """Отображает DataFrame в раскрывающемся блоке Streamlit.
+
+        Args:
+            pandas_table (pd.DataFrame): Таблица для отображения.
+        """
         with st.expander("🔬 Посмотреть детальную таблицу"):
             st.dataframe(pandas_table)
 
     def create_pandas_table(self, data_set):
+        """Преобразует список словарей в DataFrame и настраивает индекс.
+
+        Args:
+            data_set (list): Список словарей с данными симуляции.
+
+        Returns:
+            pd.DataFrame: Подготовленная таблица с установленным индексом.
+        """
         df = pn.DataFrame(data_set)
         df[self.field_name] = df.index + self.const
         df = df.set_index(self.field_name)
@@ -87,7 +126,16 @@ class Explore:
 
     @staticmethod
     def valid_input_data(count_prize, count_door, closed_door):
-        """Валидация принимаемых значений"""
+        """Проверяет корректность входных данных перед запуском симуляции.
+
+        Args:
+            count_prize (int): Количество призов.
+            count_door (int): Общее количество дверей.
+            closed_door (int): Количество закрытых дверей.
+
+        Returns:
+            dict: Словарь со статусом 'status' (bool) и текстом ошибки 'text' (str) при неудаче.
+        """
         first = count_prize <= count_door - 2
         if not first:
             response = {
@@ -126,29 +174,28 @@ class Explore:
             return response
 
     def run_simulation(self, start_params, s_fixed, max_d, close_doors, it, url):
-        """Бизнес-логика: сбор данных через API."""
+        """Метод для выполнения сетевого запроса и получения данных симуляции."""
         pass
 
     def process_and_render_results(self):
-        """Бизнес-процесс обработки и отрисовки."""
+        """Управляет процессом обработки данных из состояния сессии и их визуализацией."""
         if not st.session_state.get("data_set"):
             return
 
         df = self.create_pandas_table(st.session_state.data_set)
 
-        # Отладочная проверка: если здесь пусто, график упадет
         if df.empty:
             st.warning("Таблица данных пуста. Проверьте ответ от API.")
             return
 
         st.subheader("Результаты исследования")
-        self.get_pandas_table(df)  # Посмотрите, есть ли там колонка "Change"
+        self.get_pandas_table(df)
 
-        # Вызываем рендер только если данные валидны
         if "Change" in df.columns:
             self.render_graph_plotly(df)
         else:
             st.error(f"Столбец 'Change' не найден. Доступные столбцы: {list(df.columns)}")
 
     def explore(self, url, text_validation):
+        """Точка входа для запуска процесса исследования."""
         pass
