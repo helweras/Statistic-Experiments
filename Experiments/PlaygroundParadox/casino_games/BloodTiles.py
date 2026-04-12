@@ -44,5 +44,3 @@ class BloodTiles:
         data = {"result": round(counter / count_sim * 100, 2)}
 
         return data
-x = BloodTiles()
-casino(1000, x.start_simulate)

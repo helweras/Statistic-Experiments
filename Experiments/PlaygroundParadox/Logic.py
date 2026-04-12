@@ -8,7 +8,6 @@ def blood_tiles(post_data):
 
 
 
-casino(1000, blood_tiles_fun=blood_tiles)
 
 
 

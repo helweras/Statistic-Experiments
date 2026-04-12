@@ -1,1 +1,1 @@
-from .game_engine import Study
+from .explore_engine import Study

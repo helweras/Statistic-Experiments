@@ -54,5 +54,5 @@ class Plot:
             self.render_plot_family(data)
 
         with col2:
-            st.subheader("второй график")
+            st.subheader("Второй график")
             self.render_plot_children(data)

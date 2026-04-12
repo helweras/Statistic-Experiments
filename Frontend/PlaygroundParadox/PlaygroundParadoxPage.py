@@ -2,19 +2,11 @@ import streamlit as st
 import requests
 from .Plot import Plot
 from .Inspector_case.components import (
-    render_description,
-    render_explanations,
-    render_finish,
     render_head,
-    render_instruction,
-    render_midl_explanations,
-    render_midl_metric,
-    render_ratio,
-    render_select_part,
-    render_setting_family,
-    render_title
+    render_select_part
 )
 from .demography_study import Study
+from .Inspector_case import InspectorCase
 
 
 class PlayGroundPage:
@@ -22,6 +14,8 @@ class PlayGroundPage:
     endpoints = ("/info", "/simulate")
     url = 'https://statistic-experiments.onrender.com/'
     plot = Plot()
+    inspector = InspectorCase()
+    study = Study()
 
     def get_info(self):
         response = requests.get(self.get_url(0))
@@ -34,30 +28,10 @@ class PlayGroundPage:
         response = requests.post(self.get_url(1), json=data, timeout=20)
         return response.json()
 
-    @st.fragment
-    def config_family(self):
-        with st.container(border=True):
-            render_title()
-            render_instruction()
-            data = render_setting_family()
-            self.plot.render_two_plots(data)
-            render_explanations()
-            render_midl_metric(data)
-            render_midl_explanations()
-            render_finish()
-
-    @st.fragment
-    def study_block(self):
-        study = Study()
-        study.render_study()
-
-
     def render(self):
         render_head()
         part = render_select_part()
         if part == "Парадокс Инспектора":
-            render_description()
-            render_ratio()
-            self.config_family()
+            self.inspector.render()
         elif part == "Родственники в группе":
-            self.study_block()
+            self.study.render_study()
