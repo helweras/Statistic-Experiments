@@ -2,7 +2,7 @@ import streamlit as st
 from typing import Dict, List, Tuple, Optional, Any
 
 
-def render_choice_weight(country_data: Dict[str, Tuple[float]]) -> Dict[str, Any]:
+def render_choice_weight(country_data: Dict[str, Tuple[float, ...]]) -> Dict[str, Any]:
     """
     Отрисовывает интерфейс выбора страны и управляет весами распределения детей.
 
@@ -24,7 +24,7 @@ def render_choice_weight(country_data: Dict[str, Tuple[float]]) -> Dict[str, Any
     KEYS = ["one_child", "two_child", "three_child", "four_child", "five_child"]
     LABELS = ["1 ребенком", "2 детьми", "3 детьми", "4 детьми", "5 детьми"]
     SHORT_KEYS = ["one", "two", "three", "four", "five"]
-    DEFAULT_WEIGHTS = [55.0, 33.0, 9.0, 2.0, 1.0]
+    DEFAULT_WEIGHTS = (55.0, 33.0, 9.0, 2.0, 1.0)
 
     def on_country_change():
         """Callback для синхронизации выбора с session_state."""
@@ -54,5 +54,6 @@ def render_choice_weight(country_data: Dict[str, Tuple[float]]) -> Dict[str, Any
     return {
         "country_name": choice_country,
         "kids_data": kids_data,
-        "select_flag": bool(choice_country)
+        "select_flag": bool(choice_country),
+        "weights": current_weights
     }

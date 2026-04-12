@@ -7,8 +7,7 @@ from .components import (
     render_setting_family,
     render_choice_weight
 )
-from .type_games.blood_ties import render_kinship
-
+from ..Plot import Plot
 
 class Study:
     demographic_profiles = {
@@ -21,6 +20,11 @@ class Study:
         "Нигерия": (12.0, 15.0, 22.0, 20.0, 31.0),
         "Израиль": (18.0, 25.0, 25.0, 17.0, 15.0)
     }
+    plot = Plot()
+
+    def simulate(self, data):
+        pass
+
 
     def render_study(self):
         with st.container(border=True):
@@ -28,3 +32,6 @@ class Study:
             render_rules()
             set_data = render_choice_weight(self.demographic_profiles)
             data_user = render_setting_family(set_data)
+            self.plot.render_plot_family(data_user["for_plot"])
+
+
