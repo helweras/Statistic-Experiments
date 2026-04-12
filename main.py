@@ -26,7 +26,7 @@ def start():
                 },
                 {
                     "name": "Playground Paradox",
-                    "name_on_page": "Парадокс детской площадки",
+                    "name_on_page": "Институт парадоксов родства",
                     "uuid": 123345,
                     "description": "anything"
                 }]
