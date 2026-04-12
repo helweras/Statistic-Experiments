@@ -9,7 +9,7 @@ class HomePage:
     data: dict | None = None
     endpoints = {'Monty_Hall': "/monty_hall"}
     pages = {'Парадокс Монти-Холла': MontyHallPage(),
-             "Парадокс детской площадки": PlayGroundPage()}
+             "Институт парадоксов родства": PlayGroundPage()}
 
     def __init__(self):
         self.start()
@@ -32,7 +32,7 @@ class HomePage:
         )
 
     def side_bar(self):
-        st.sidebar.title("выбор эксперимента")
+        st.sidebar.title("Выбор эксперимента")
         experiments_name = list(i['name_on_page'] for i in self.data['experiments'] if i['name_on_page'] is not None)
         with st.sidebar:
             st.header("Эксперименты")

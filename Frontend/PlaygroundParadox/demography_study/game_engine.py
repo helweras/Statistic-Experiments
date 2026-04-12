@@ -8,13 +8,13 @@ from .components import (
 from .type_games.blood_ties import render_kinship
 
 
-class Casino:
+class Study:
     name_game = {"Кровные узы": render_kinship,
                  "Точка невозврата": None,
                  "Большой куш": None,
                  "Охота за головами": None}
 
-    def render_casino(self):
+    def render_study(self):
         with st.container(border=True):
             render_intro()
             render_rules()

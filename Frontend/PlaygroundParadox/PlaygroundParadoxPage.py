@@ -1,7 +1,7 @@
 import streamlit as st
 import requests
 from .Plot import Plot
-from .components import (
+from .Inspector_case.components import (
     render_description,
     render_explanations,
     render_finish,
@@ -14,7 +14,7 @@ from .components import (
     render_setting_family,
     render_title
 )
-from .demography_casino import Casino
+from .demography_study import Study
 
 
 class PlayGroundPage:
@@ -47,16 +47,17 @@ class PlayGroundPage:
             render_finish()
 
     @st.fragment
-    def casino_block(self):
-        casino = Casino()
-        casino.render_casino()
+    def study_block(self):
+        study = Study()
+        study.render_study()
+
 
     def render(self):
         render_head()
         part = render_select_part()
-        if part == "Разбор парадокса":
+        if part == "Парадокс Инспектора":
             render_description()
             render_ratio()
             self.config_family()
-        elif part == "Играть в казино":
-            self.casino_block()
+        elif part == "Родственники в группе":
+            self.study_block()

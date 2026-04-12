@@ -1,5 +1,6 @@
 import random
 from Experiments.PlaygroundParadox.Components import ChildHouse
+from Experiments.PlaygroundParadox.Components.casino_terminal import casino
 
 
 class BloodTiles:
@@ -43,3 +44,5 @@ class BloodTiles:
         data = {"result": round(counter / count_sim * 100, 2)}
 
         return data
+x = BloodTiles()
+casino(1000, x.start_simulate)

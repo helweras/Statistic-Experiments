@@ -31,9 +31,9 @@ def casino(coin, blood_tiles_fun):
 
     while dk > 0:
         post_request = {
-            "weight": gen_random_weight(),
-            "value": get_random_value(),
-            "count_sim": 1000,
+            "weight": (8, 22, 55, 6, 9),
+            "value": 15,
+            "count_sim": 10000,
             "num_of_family": 100
         }
         print(f"dk = {dk}")
@@ -52,3 +52,5 @@ def casino(coin, blood_tiles_fun):
         input("Нажми Enter что бы продолжить")
         print("=================================")
     print("end")
+
+
