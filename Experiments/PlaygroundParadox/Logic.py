@@ -1,5 +1,4 @@
 from casino_games.BloodTiles import BloodTiles
-from Components.casino_terminal import casino
 
 def blood_tiles(post_data):
     blood_experiment = BloodTiles()
