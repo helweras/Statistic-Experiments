@@ -21,10 +21,10 @@ class BloodTiles:
 
     def start_simulate(self, post_data):
 
-        weight = post_data["weight"]
-        value = post_data["value"]
-        count_sim = post_data["count_sim"]
-        num_of_family = post_data["num_of_family"]
+        weight = post_data.weight
+        value = post_data.value
+        count_sim = post_data.count_sim
+        num_of_family = post_data.num_of_family
 
         counter = 0
 
