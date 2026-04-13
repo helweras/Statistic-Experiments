@@ -1,4 +1,4 @@
-from casino_games.BloodTiles import BloodTiles
+from .casino_games.BloodTiles import BloodTiles
 
 def blood_tiles(post_data):
     blood_experiment = BloodTiles()
