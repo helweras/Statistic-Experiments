@@ -1,8 +1,27 @@
 import plotly.graph_objects as go
+import pandas as pd
 import streamlit as st
 
 
 class Plot:
+
+
+    def render_plot(self, data_pandas):
+        fig = go.Figure
+
+
+    def create_pandas_table(self, data_set:dict):
+        """Преобразует список словарей в DataFrame и настраивает индекс.
+
+        Args:
+            data_set (list): Список словарей с данными симуляции.
+
+        Returns:
+            pd.DataFrame: Подготовленная таблица с установленным индексом.
+        """
+        df = pd.DataFrame(list(data_set.items()), columns=["step", "result"])
+        return df
+
     def render_plot_family(self, data: dict):
         colors = ["#1fcecb", "#731fce", "#ce1f22", "#7ace1f", "#cecb1f"]
         label = list(data.keys())
@@ -43,8 +62,6 @@ class Plot:
         ])
         fig.update_layout(yaxis_title="Доля детей (%)", yaxis=dict(range=[0, 100]), height=400)
         st.plotly_chart(fig, width="content")
-
-
 
     def render_two_plots(self, data: dict):
         col1, col2 = st.columns(2)

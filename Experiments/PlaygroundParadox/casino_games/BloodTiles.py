@@ -1,6 +1,5 @@
 import random
 from Experiments.PlaygroundParadox.Components import ChildHouse
-from Experiments.PlaygroundParadox.Components.casino_terminal import casino
 
 
 class BloodTiles:

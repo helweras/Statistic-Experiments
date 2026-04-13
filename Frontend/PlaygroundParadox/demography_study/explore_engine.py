@@ -12,6 +12,7 @@ from .components import (
 )
 from ..Plot import Plot
 
+
 class Study:
     demographic_profiles = {
         "Россия (среднее)": (58.0, 33.0, 7.0, 1.5, 0.5),
@@ -29,24 +30,22 @@ class Study:
     endpoints = ("/info", "/start_blood_tiles")
     client = ClientService(f'https://statistic-experiments.onrender.com{prefix}')
 
-
     def simulate(self, data, status_btn):
         if status_btn:
             max_value = data["value"]
             response_data = []
+            n_count = list(range(2, max_value))
 
-            for n in range(2, max_value):
+            for n in n_count:
                 payload = {
                     'weight': data["weight"],
-                     'value': n,
-                     'count_sim': data["count_sim"],
-                     'num_of_family': data["num_of_family"]
+                    'value': n,
+                    'count_sim': data["count_sim"],
+                    'num_of_family': data["num_of_family"]
                 }
-
-                response_data.append(self.client.post_data(self.endpoints[1], payload))
-            return response_data
-
-
+                response_data.append(self.client.post_data(self.endpoints[1], payload)["result"])
+            data_for_plot = dict(zip(n_count, response_data))
+            return data_for_plot
 
     def render_study(self):
         with st.container(border=True):
@@ -56,7 +55,5 @@ class Study:
             data_user = render_setting_family(set_data)
             self.plot.render_plot_family(data_user["for_plot"])
             status_btn = render_sim_button("start", "playground_sim_btn")
-            x = self.simulate(data_user["for_sim"], status_btn)
-            st.text(x)
-
+            table = self.simulate(data_user["for_sim"], status_btn)
 
