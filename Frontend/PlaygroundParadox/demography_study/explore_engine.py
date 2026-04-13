@@ -1,11 +1,14 @@
 import streamlit as st
+import requests
+from ..client_servise import ClientService
 from .components import (
     render_intro,
     render_rules,
     gen_random_weight,
     render_select_game,
     render_setting_family,
-    render_choice_weight
+    render_choice_weight,
+    render_sim_button
 )
 from ..Plot import Plot
 
@@ -21,9 +24,28 @@ class Study:
         "Израиль": (18.0, 25.0, 25.0, 17.0, 15.0)
     }
     plot = Plot()
+    url = 'https://statistic-experiments.onrender.com'
+    prefix = "/playground"
+    endpoints = ("/info", "/start_blood_tiles")
+    client = ClientService(f'https://statistic-experiments.onrender.com{prefix}')
 
-    def simulate(self, data):
-        pass
+
+    def simulate(self, data, status_btn):
+        if status_btn:
+            max_value = data["value"]
+            response_data = []
+
+            for n in range(2, max_value):
+                payload = {
+                    'weight': data["weight"],
+                     'value': n,
+                     'count_sim': data["count_sim"],
+                     'num_of_family': data["num_of_family"]
+                }
+
+                response_data.append(self.client.post_data(self.endpoints[1], payload))
+            return response_data
+
 
 
     def render_study(self):
@@ -33,5 +55,8 @@ class Study:
             set_data = render_choice_weight(self.demographic_profiles)
             data_user = render_setting_family(set_data)
             self.plot.render_plot_family(data_user["for_plot"])
+            status_btn = render_sim_button("start", "playground_sim_btn")
+            x = self.simulate(data_user["for_sim"], status_btn)
+            st.text(x)
 
 

@@ -88,7 +88,7 @@ def render_setting_family(data):
         )
 
     setting_simulate = {
-        "weight": weights,
+        "weight": tuple(weights),
         "value": value,
         "count_sim": count_sim,
         "num_of_family": num_of_family
