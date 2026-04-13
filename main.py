@@ -1,8 +1,10 @@
 from fastapi import FastAPI
 from Experiments.MontyHall import Router as Monty
+from Experiments.PlaygroundParadox import Router as PlGr
 
 app = FastAPI()
 app.include_router(Monty.router)
+app.include_router(PlGr.router)
 
 
 # uvicorn main:app --reload - для запуска сервера
