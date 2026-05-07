@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from Models.PlaygroundParadox.BloodTiles import BloodTilesData
+from models.PlaygroundParadox.BloodTiles import BloodTilesData
 from .Logic import blood_tiles
 
 rules = """# 👨‍👩‍👧‍👦 Парадокс детской площадки

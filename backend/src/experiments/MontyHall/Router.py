@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from Models.Monty_Hall import MontyHallData
+from models.Monty_Hall import MontyHallData
 from Experiments.MontyHall.Logic import start_experiment, valid_input_data
 
 router = APIRouter(

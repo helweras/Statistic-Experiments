@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pn
-from Frontend.MontyHall.ServiceClass import Service
+from frontend.MontyHall.ServiceClass import Service
 import plotly.graph_objects as go
 
 
