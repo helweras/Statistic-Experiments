@@ -1,6 +1,6 @@
 from fastapi import APIRouter
-from models.Monty_Hall import MontyHallData
-from Experiments.MontyHall.Logic import start_experiment, valid_input_data
+from src.experiments.MontyHall.schemas import MontyHallDataRequest, MontyHallDataResponse
+from src.experiments.MontyHall.logic.engine import start_experiment
 
 router = APIRouter(
     prefix='/monty_hall',
@@ -38,22 +38,12 @@ def info():
     }
 
 
-@router.post("/simulate")
-def start_simulate(data: MontyHallData):
+@router.post("/simulate", response_model=MontyHallDataResponse)
+def start_simulate(data: MontyHallDataRequest):
     count_prize = data.count_prize
     count_door = data.count_doors
     closed_doors = data.closed_doors
-    if valid_input_data(count_prize=count_prize, count_door=count_door, closed_door=closed_doors):
 
-        result = start_experiment(count_prize=count_prize, count_door=count_door, closed_door=closed_doors)
-        return {
-            "status": "Good",
-            "data": result
-        }
-    else:
-        return {
-            "status": "Bad",
-            "error": "400",
-            "name_error": "bad request",
-            "msg": "Данные не прошли валидацию"
-        }
+
+    result = start_experiment(count_prize=count_prize, count_door=count_door, closed_door=closed_doors)
+    return result
