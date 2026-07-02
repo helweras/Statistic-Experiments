@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from src.experiments.MontyHall.schemas import MontyHallDataRequest, MontyHallDataResponse
-from src.experiments.MontyHall.logic.engine import start_experiment
+from src.experiments.MontyHall.logic.engine import Simulate
 
 router = APIRouter(
     prefix='/monty_hall',
@@ -44,6 +44,10 @@ def start_simulate(data: MontyHallDataRequest):
     count_door = data.count_doors
     closed_doors = data.closed_doors
 
+    simulate = Simulate()
 
-    result = start_experiment(count_prize=count_prize, count_door=count_door, closed_door=closed_doors)
+
+    result = simulate.start_simulate(count_prize=count_prize,
+                                     count_door=count_door,
+                                     closed_door=closed_doors)
     return result

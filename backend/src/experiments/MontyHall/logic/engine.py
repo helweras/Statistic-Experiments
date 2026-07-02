@@ -71,29 +71,27 @@ class Simulate:
         """Проведение эксперимента
         возвращает процент угаданных дверей за которыми был приз"""
         win = 0
-        if self.valid_input_data(count_prize, count_door, closed_door):  # Проверка данных
-            for i in range(iteration):  # iteration - количество экспериментов
-                door_list = self.generate_door_list(count_door)  # генерация списка дверей
-                self.put_the_prize(door_list, count_prize)  # Кладем приз за одну из дверей
-                selected_door = self.pick_door(door_list)  # Выбираем случайную дверь
-                close_door = self.get_closed_doors(door_list, closed_door)  # Оставляем закрытые двери
-                if change:  # Выбор стратегии
-                    selected_door = self.pick_door(close_door)  # Меняем дверь на одну из закрытых
-                win += selected_door.prize  # Если за выбранной дверью есть приз win += 1
+        for i in range(iteration):  # iteration - количество экспериментов
+            door_list = self.generate_door_list(count_door)  # генерация списка дверей
+            self.put_the_prize(door_list, count_prize)  # Кладем приз за одну из дверей
+            selected_door = self.pick_door(door_list)  # Выбираем случайную дверь
+            close_door = self.get_closed_doors(door_list, closed_door)  # Оставляем закрытые двери
+            if change:  # Выбор стратегии
+                selected_door = self.pick_door(close_door)  # Меняем дверь на одну из закрытых
+            win += selected_door.prize  # Если за выбранной дверью есть приз win += 1
 
-            return round(win / iteration * 100, 2)  # Результат в процентах
-        print("Ошибка данных")
-        return False
+        return round(win / iteration * 100, 2)  # Результат в процентах
+
 
     def get_base_case(self, iteration=1000, change=True):
         """Возвращает результат классического случая"""
         return self.get_result(change=change, count_prize=1, count_door=3, closed_door=1, iteration=iteration)
 
-    def start_experiment(self,
-            count_prize=10,
-            count_door=30,
-            closed_door=10,
-            iteration=1000
+    def start_simulate(self,
+            count_prize=1,
+            count_door=3,
+            closed_door=1,
+            iterable=1000
     ):
 
         """
@@ -107,5 +105,7 @@ class Simulate:
                 strategy_name = "Stay"
             data_other[strategy_name] = self.get_result(change=strat, count_prize=count_prize, count_door=count_door,
                                                    closed_door=closed_door,
-                                                   iteration=iteration)
+                                                   iteration=iterable)
         return {"data_experiments": data_other}
+
+

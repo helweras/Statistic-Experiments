@@ -1,0 +1,16 @@
+frontend/
+├── .streamlit/
+│   └── config.toml      # Настройка темы (цвета, шрифты) и отключение лишнего UI
+├── app.py
+├── config.py
+├── requirements.txt     # Зависимости (streamlit, requests и т.д.)
+└── src/
+    ├── api.py
+    ├── state.py
+    ├── components/
+    │   ├── header.py
+    │   └── loader.py
+    └── views/
+        ├── main_page.py
+        ├── monty_hall.py
+        └── birthday.py

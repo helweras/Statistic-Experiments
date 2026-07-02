@@ -12,7 +12,7 @@ class MontyHallDataRequest(BaseModel):
 
     count_doors: int = Field(
         default=3,
-        gt=1,
+        gt=2,
         le=100,
         description="Общее количество дверей в симуляции"
     )
@@ -37,9 +37,6 @@ class MontyHallDataRequest(BaseModel):
         prizes = self.count_prize
         doors = self.count_doors
         closed = self.closed_doors
-
-        if prizes <= 0 or doors <= 0 or closed <= 0:
-            raise ValueError("Все значения (призы, двери, закрытые двери) должны быть больше 0")
 
         if prizes > (doors - 2):
             raise ValueError(
