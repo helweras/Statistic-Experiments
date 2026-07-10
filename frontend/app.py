@@ -1,4 +1,8 @@
 import streamlit as st
+from src.state import init_session
+from config import REGISTRY_PAGES
+from src.components import side_bar
+
 
 
 st.set_page_config(
@@ -7,3 +11,13 @@ st.set_page_config(
     layout="wide",  # Делает интерфейс на весь экран
     initial_sidebar_state="expanded"
 )
+
+
+init_session()
+
+select_page = side_bar.render(REGISTRY_PAGES)
+
+st.session_state.current_page = select_page["id"]
+
+# 3. Запускаем рендеринг страницы
+select_page["render_func"]()
