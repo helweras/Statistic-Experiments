@@ -1,6 +1,6 @@
 import streamlit as st
 from src.state import init_session
-from config import REGISTRY_PAGES
+from pages_list import REGISTRY_PAGES
 from src.components import side_bar
 
 

@@ -1,5 +1,8 @@
 from fastapi import APIRouter
-from src.experiments.MontyHall.schemas import MontyHallDataRequest, MontyHallDataResponse
+from src.experiments.MontyHall.schemas import (
+    MontyHallBatchResponse,
+    MontyHallBatchRequest
+)
 from src.experiments.MontyHall.logic.engine import Simulate
 
 router = APIRouter(
@@ -38,16 +41,18 @@ def info():
     }
 
 
-@router.post("/simulate", response_model=MontyHallDataResponse)
-def start_simulate(data: MontyHallDataRequest):
-    count_prize = data.count_prize
-    count_door = data.count_doors
-    closed_doors = data.closed_doors
-
+@router.post("/simulate", response_model=MontyHallBatchResponse)
+def start_simulate(data: MontyHallBatchRequest):
     simulate = Simulate()
+    results = []
 
+    for elem_data in data.simulations:
+        count_prize = elem_data.count_prize
+        count_door = elem_data.count_doors
+        closed_doors = elem_data.closed_doors
 
-    result = simulate.start_simulate(count_prize=count_prize,
-                                     count_door=count_door,
-                                     closed_door=closed_doors)
-    return result
+        result = simulate.start_simulate(count_prize=count_prize,
+                                         count_door=count_door,
+                                         closed_door=closed_doors)
+        results.append(result)
+    return MontyHallBatchResponse(batch_results=results)

@@ -1,1 +1,0 @@
-from .info import render_info

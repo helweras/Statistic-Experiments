@@ -1,5 +1,5 @@
 from pydantic import BaseModel, model_validator, Field
-from typing import Dict
+from typing import Dict, List
 
 
 
@@ -25,7 +25,7 @@ class MontyHallDataRequest(BaseModel):
 
     iterable: int = Field(
         default=1000,
-        gt=100,
+        ge=50,
         le=1000,
         description="Количество итераций (повторений) эксперимента для статистики"
     )
@@ -56,3 +56,20 @@ class MontyHallDataRequest(BaseModel):
 
 class MontyHallDataResponse(BaseModel):
     data_experiments: Dict[str, float]
+
+
+class MontyHallBatchRequest(BaseModel):
+    """Модель для входящего пакета из нескольких симуляций"""
+    simulations: List[MontyHallDataRequest] = Field(
+        ...,
+        min_length=1,
+        max_length=20,  # Защита: не даем слать слишком гигантские пакеты
+        description="Список конфигураций для одновременного расчета симуляций"
+    )
+
+class MontyHallBatchResponse(BaseModel):
+    """Модель для исходящего пакета с результатами"""
+    batch_results: List[MontyHallDataResponse] = Field(
+        ...,
+        description="Список результатов, порядок совпадает со списком запроса"
+    )
