@@ -4,7 +4,7 @@ from typing import Dict, List
 
 
 class MontyHallDataRequest(BaseModel):
-    count_prize: int = Field(
+    count_prizes: int = Field(
         default=1,
         gt=0,
         description="Количество призов (выигрышных дверей) в игре"
@@ -34,7 +34,7 @@ class MontyHallDataRequest(BaseModel):
     def valid_input_data(self) -> "MontyHallDataRequest":
 
         # Извлекаем данные для удобства
-        prizes = self.count_prize
+        prizes = self.count_prizes
         doors = self.count_doors
         closed = self.closed_doors
 

@@ -9,15 +9,21 @@ class MontyHallState:
         if "single_result" not in st.session_state:
             st.session_state.single_result = None
 
+
         if "explore_result" not in st.session_state:
             st.session_state.explore_result = None
+
+
 
     @property
     def explore_df(self) -> pd.DataFrame:
         """Возвращает DataFrame исследования, если он есть, иначе пустой."""
         if st.session_state.explore_result is None:
             return pd.DataFrame()
-        return pd.DataFrame(st.session_state.explore_result)
+        raw_df = pd.DataFrame(st.session_state.explore_result)
+
+        df = pd.DataFrame(raw_df["data_experiments"].tolist())
+        return df
 
     @staticmethod
     def set_explore_result(data):
@@ -28,3 +34,10 @@ class MontyHallState:
     def set_single_result(data):
         st.session_state.single_result = data
 
+    @staticmethod
+    def delite_explore_result():
+        st.session_state.explore_result = None
+
+    @staticmethod
+    def delite_single_result():
+        st.session_state.single_result = None

@@ -47,12 +47,12 @@ def start_simulate(data: MontyHallBatchRequest):
     results = []
 
     for elem_data in data.simulations:
-        count_prize = elem_data.count_prize
-        count_door = elem_data.count_doors
+        count_prizes = elem_data.count_prizes
+        count_doors = elem_data.count_doors
         closed_doors = elem_data.closed_doors
 
-        result = simulate.start_simulate(count_prize=count_prize,
-                                         count_door=count_door,
-                                         closed_door=closed_doors)
+        result = simulate.start_simulate(count_prizes=count_prizes,
+                                         count_doors=count_doors,
+                                         closed_doors=closed_doors)
         results.append(result)
     return MontyHallBatchResponse(batch_results=results)

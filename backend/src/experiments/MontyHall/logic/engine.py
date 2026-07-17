@@ -63,19 +63,19 @@ class Simulate:
 
     def get_result(self,
             change=True,
-            count_prize=10,
-            count_door=30,
-            closed_door=10,
+            count_prizes=10,
+            count_doors=30,
+            closed_doors=10,
             iteration=1000
     ):
         """Проведение эксперимента
         возвращает процент угаданных дверей за которыми был приз"""
         win = 0
         for i in range(iteration):  # iteration - количество экспериментов
-            door_list = self.generate_door_list(count_door)  # генерация списка дверей
-            self.put_the_prize(door_list, count_prize)  # Кладем приз за одну из дверей
+            door_list = self.generate_door_list(count_doors)  # генерация списка дверей
+            self.put_the_prize(door_list, count_prizes)  # Кладем приз за одну из дверей
             selected_door = self.pick_door(door_list)  # Выбираем случайную дверь
-            close_door = self.get_closed_doors(door_list, closed_door)  # Оставляем закрытые двери
+            close_door = self.get_closed_doors(door_list, closed_doors)  # Оставляем закрытые двери
             if change:  # Выбор стратегии
                 selected_door = self.pick_door(close_door)  # Меняем дверь на одну из закрытых
             win += selected_door.prize  # Если за выбранной дверью есть приз win += 1
@@ -85,27 +85,27 @@ class Simulate:
 
     def get_base_case(self, iteration=1000, change=True):
         """Возвращает результат классического случая"""
-        return self.get_result(change=change, count_prize=1, count_door=3, closed_door=1, iteration=iteration)
+        return self.get_result(change=change, count_prizes=1, count_doors=3, closed_doors=1, iteration=iteration)
 
     def start_simulate(self,
-            count_prize=1,
-            count_door=3,
-            closed_door=1,
-            iterable=1000
+            count_prizes=1,
+            count_doors=3,
+            closed_doors=1,
+            iterable=175
     ):
+
 
         """
         возвращает результат эксперимента:
         """
-        data_other = {}
+        data = {}
         for strat in self.strategy:
             if strat:
                 strategy_name = "Change"
             else:
                 strategy_name = "Stay"
-            data_other[strategy_name] = self.get_result(change=strat, count_prize=count_prize, count_door=count_door,
-                                                   closed_door=closed_door,
+            data[strategy_name] = self.get_result(change=strat, count_prizes=count_prizes, count_doors=count_doors,
+                                                   closed_doors=closed_doors,
                                                    iteration=iterable)
-        return {"data_experiments": data_other}
-
+        return {"data_experiments": data}
 

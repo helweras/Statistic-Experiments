@@ -1,38 +1,12 @@
 import streamlit as st
+
 from src.components.render_description import render_description_experiment
 from src.state.monty_hall_state import MontyHallState
 from src.api.api_monty_hall import post_simulate
 from config import MontyHallEndpoints
 from enum import Enum
-from typing import Dict, Union
-
-def _render_explore(state: MontyHallState):
-    with st.container(border=True):
-        st.write("Выясним, как меняется преимущество смены выбора с увеличением общего числа закрытых дверей.")
-        # 1. Блок ввода параметров
-        c1, c2, c3 = st.columns(3)
-        range_close_doors = st.slider("Диапазон закрытых количество дверей", 6, 20, (6, 10))
-        min_close_doors, max_close_doors = range_close_doors
-        iterable = c3.select_slider("Итераций", options=[50, 75, 100, 150], value=75)
-        count_doors = c2.number_input("Количество дверей", max_close_doors + 2, 22, max_close_doors + 2)
-        count_prize = c1.number_input("Количество призов", 1, min_close_doors, 1)
-        st.markdown(f"### 🚀 Симуляция стартует с **{min_close_doors}** и до **{max_close_doors}** закрытых дверей.")
-        if st.button("Запустить исследование", type="primary"):
-            data_batch = {"simulations": []}
-            start_range = int(min_close_doors) if min_close_doors is not None else 1
-            end_range = int(max_close_doors) if max_close_doors is not None else 10
-            for close_doors in range(start_range, end_range + 1):
-                data = {
-                    "count_prize": count_prize,
-                    "count_doors": count_doors,
-                    "closed_doors": close_doors,
-                    "iterable": iterable
-                }
-                data_batch["simulations"].append(data)
-            simulate = MontyHallEndpoints.SIMULATE.value
-            response = post_simulate(data_batch, simulate)
-            state.set_explore_result(response)
-
+from typing import Dict, Union, Any
+from src.components.monty_hall_charts import create_explore_chart
 
 
 class MontyHallExploreType(str, Enum):
@@ -41,37 +15,56 @@ class MontyHallExploreType(str, Enum):
     PRIZES = "count_prizes"
 
 
-MONTY_HALL_EXPLORE_CONFIGS = {
+MONTY_HALL_EXPLORE_CONFIGS: dict[MontyHallExploreType, dict[str, Any]] = {
     MontyHallExploreType.CLOSED_DOORS: {
         "description": "Исследуем изменение преимущества смены выбора при росте числа ЗАКРЫТЫХ дверей.",
+        "description_x_chart": "Закрытые двери",
         "slider_label": "Диапазон закрытых дверей",
+        "slider_min": 1,
+        "slider_max": 20,
+        "slider_default": (1, 10),
         # Что фиксируем в колонках c1 и c2:
-        "c1_param": "prizes",
+        "c1_param": "count_prizes",
         "c1_label": "Фиксированные призы",
-        "c2_param": "total_doors",
+        # СТУПЕНЬ 2: Дописали пропущенные ключи для защиты от KeyError
+        "c1_min": 1,
+        "c1_default": 1,
+        "c2_param": "count_doors",
         "c2_label": "Фиксированное общее число дверей",
+        "c2_min": 3,
+        "c2_default": 10,
     },
     MontyHallExploreType.DOORS: {
         "description": "Исследуем изменение преимущества смены выбора при росте ОБЩЕГО количества дверей.",
+        "description_x_chart": "Двери",
         "slider_label": "Диапазон общего количества дверей (Max)",
+        "slider_min": 3,
+        "slider_max": 20,
+        "slider_default": (3, 10),
         # Что фиксируем в колонках c1 и c2:
-        "c1_param": "prizes",
+        "c1_param": "count_prizes",
         "c1_label": "Фиксированные призы",
+        "c1_min": 1,
+        "c1_default": 1,
+        "c1_max": 18,
         "c2_param": "closed_doors",
         "c2_label": "Фиксированные закрытые двери ведущего",
+        "c2_min": 1,
+        "c2_default": 1,
+        "c2_max": 19
     },
     MontyHallExploreType.PRIZES: {
         "description": "Исследуем изменение преимущества смены выбора при росте количества ПРИЗОВ.",
+        "description_x_chart": "Количество призов",
         "slider_label": "Диапазон количества призов",
         "slider_min": 1,
         "slider_max": 10,
         "slider_default": (1, 5),
-        # Настройки ФИКСИРОВАННОГО поля в c1 (Все двери)
-        "c1_param": "total_doors",
+        # СТУПЕНЬ 3: Исправлена опечатка "total_doors" -> "count_doors" для синхронизации
+        "c1_param": "count_doors",
         "c1_label": "Фиксированное общее число дверей",
         "c1_min": 3,
         "c1_default": 10,
-        # Настройки ФИКСИРОВАННОГО поля в c2 (Закрытые двери)
         "c2_param": "closed_doors",
         "c2_label": "Фиксированные закрытые двери ведущего",
         "c2_min": 1,
@@ -80,24 +73,23 @@ MONTY_HALL_EXPLORE_CONFIGS = {
 }
 
 
-
 def valid_data(data: Dict[str, list[Dict[str, Union[int, float, None]]]], index):
     test_data_batch = data["simulations"]
 
     for batch in test_data_batch:
-        count_prize = batch.get("count_prize")
+        count_prizes = batch.get("count_prizes")
         closed_doors = batch.get("closed_doors")
         count_doors = batch.get("count_doors")
 
         # 1. Валидация на заполненность
-        if count_prize is None or count_doors is None:
+        if (count_prizes is None) or (count_doors is None):
             st.error(f"❌ Ошибка в симуляции №{index}: Пожалуйста, заполните все поля числовыми значениями!")
             st.warning("Проблемные данные:")
             st.json(batch)  # Выводим конкретный неправильный кусочек данных
             return False
 
         # 2. Валидация логики (призы < дверей)
-        if count_prize >= count_doors:
+        if count_prizes >= count_doors:
             st.error(f"❌ Ошибка в симуляции №{index}: Количество призов должно быть меньше количества дверей!")
             st.warning("Проблемные данные:")
             st.json(batch)
@@ -112,7 +104,7 @@ def valid_data(data: Dict[str, list[Dict[str, Union[int, float, None]]]], index)
             return False
 
         # 4. Валидация призов и закрытых дверей
-        if count_prize > closed_doors:
+        if count_prizes > closed_doors:
             st.error(
                 f"❌ Ошибка в симуляции №{index}: Количество призов должно быть меньше или равно количеству закрытых дверей!")
             st.warning("Проблемные данные:")
@@ -122,8 +114,10 @@ def valid_data(data: Dict[str, list[Dict[str, Union[int, float, None]]]], index)
     return True
 
 
+@st.fragment
 def _render_explore_generic(explore_type: MontyHallExploreType, state: MontyHallState):
     cfg = MONTY_HALL_EXPLORE_CONFIGS[explore_type]
+    x_axis_description = cfg["description_x_chart"]
 
     with st.container(border=True):
         st.write(cfg["description"])
@@ -132,7 +126,6 @@ def _render_explore_generic(explore_type: MontyHallExploreType, state: MontyHall
         c1, c2, c3 = st.columns(3)
 
         # 1. Главный слайдер исследования (Динамическая переменная)
-        # Он всегда определяет верхнюю границу диапазона (max_val)
         min_val, max_val = st.slider(cfg["slider_label"], cfg["slider_min"], cfg["slider_max"], cfg["slider_default"],
                                      key=f"slider_{explore_type.value}")
 
@@ -140,7 +133,6 @@ def _render_explore_generic(explore_type: MontyHallExploreType, state: MontyHall
         iterable = c3.select_slider("Итераций", options=[50, 75, 100, 150], value=75, key=f"it_{explore_type.value}")
 
         # 2. Динамическая отрисовка ФИКСИРОВАННЫХ параметров в c1 и c2
-        # Мы не знаем заранее, что там будет, пока не заглянем в cfg
         fix_val_1 = int(
             c1.number_input(cfg["c1_label"], min_value=cfg["c1_min"], value=cfg["c1_default"], step=1,
                             key=f"fix1_{explore_type.value}"))
@@ -149,7 +141,7 @@ def _render_explore_generic(explore_type: MontyHallExploreType, state: MontyHall
                             key=f"fix2_{explore_type.value}"))
 
         st.markdown(f"### 🚀 Симуляция запускается в диапазоне от **{min_val}** до **{max_val}**."
-                    f"Всего будет {max_val-min_val+1} точек на графике")
+                    f"Всего будет {max_val - min_val + 1} точек на графике")
 
         if st.button("Запустить исследование", type="primary", key=f"btn_{explore_type.value}"):
             if max_val - min_val + 1 < 5:
@@ -172,8 +164,6 @@ def _render_explore_generic(explore_type: MontyHallExploreType, state: MontyHall
                 # Заполняем вторую фиксированную переменную из колонки c2
                 sim_data[cfg["c2_param"]] = fix_val_2
 
-                # Приводим ключи словаря к именам, которые строго ожидает Pydantic на бэкенде:
-                # На бэкенде поля называются count_prize и count_doors, а в Enum у нас prizes и total_doors
                 payload = {
                     cfg["c1_param"]: fix_val_1,
                     cfg["c2_param"]: fix_val_2,
@@ -181,26 +171,26 @@ def _render_explore_generic(explore_type: MontyHallExploreType, state: MontyHall
                     "iterable": iterable
                 }
 
-
                 data_for_test = {"simulations": [payload]}
                 if valid_data(data_for_test, index=index):
 
                     data_batch["simulations"].append(payload)
-                else:
-                    return
+
 
             # Отправка на бэкенд FastAPI
-            print(data_batch)
             simulate_endpoint = MontyHallEndpoints.SIMULATE.value
             with st.spinner("Загрузка данных с бэкенда..."):
                 response = post_simulate(data_batch, simulate_endpoint)
 
             st.success("🎉 Исследование успешно завершено!")
             state.set_explore_result(response)
-            st.text(state.explore_df)
-            st.rerun()
+        x_scatters = list(range(min_val, max_val))
+        df = state.explore_df
+        plot = create_explore_chart(df, x_axis_description, x_scatters=x_scatters)
+        st.plotly_chart(plot)
 
 
+@st.fragment
 def _render_input_form(state: MontyHallState):
     """
     Отрисовывает форму Streamlit для сбора параметров эксперимента.
@@ -246,8 +236,33 @@ def _render_input_form(state: MontyHallState):
                 state.set_single_result(response)
 
 
+def _render_explore_section(state: MontyHallState):
+    st.markdown("---")
+    st.subheader("🔬 Исследование зависимостей")
+
+    explore_options = {
+        "Количество призов": MontyHallExploreType.PRIZES,
+        "Общее количество дверей": MontyHallExploreType.DOORS,
+        "Количество закрытых дверей": MontyHallExploreType.CLOSED_DOORS
+    }
+
+    # Отрисовываем меню
+    selected_label = st.selectbox(
+        label="Выберите переменную для исследования зависимости:",
+        options=list(explore_options.keys()),
+        index=0,
+        key="mh_explore_variable_selector",
+        on_change=state.delite_explore_result()  # Привязали сброс данных
+    )
+
+    chosen_type = explore_options[selected_label]
+
+    # Весь блок эксперимента (слайдеры, кнопка, циклы) уходит сюда:
+    _render_explore_generic(explore_type=chosen_type, state=state)
+
+
 def render():
     state = MontyHallState()
     render_description_experiment("Monty_Hall")
     _render_input_form(state=state)
-    _render_explore_generic(MontyHallExploreType.PRIZES, state)
+    _render_explore_section(state=state)
